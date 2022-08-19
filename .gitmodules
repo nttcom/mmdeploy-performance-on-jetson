@@ -1,0 +1,6 @@
+[submodule "space/mmdeploy"]
+	path = space/mmdeploy
+	url = https://github.com/open-mmlab/mmdeploy.git
+[submodule "space/mmdetection"]
+	path = space/mmdetection
+	url = https://github.com/open-mmlab/mmdetection.git

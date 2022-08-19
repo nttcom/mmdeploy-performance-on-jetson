@@ -1,0 +1,66 @@
+diff -ur space/mmdeploy/mmdeploy/utils/timer.py patches/mmdeploy/mmdeploy/utils/timer.py
+--- space/mmdeploy/mmdeploy/utils/timer.py
++++ patches/mmdeploy/mmdeploy/utils/timer.py
+@@ -7,7 +7,7 @@
+ import numpy as np
+ import torch
+ 
+-from mmdeploy.utils.logging import get_logger
++from mmcv.utils import get_logger
+ 
+ 
+ class TimeCounter:
+diff -ur space/mmdeploy/tools/regression_test.py patches/mmdeploy/tools/regression_test.py
+--- space/mmdeploy/tools/regression_test.py
++++ patches/mmdeploy/tools/regression_test.py
+@@ -248,7 +248,7 @@
+     report_dict.get('Static or Dynamic').append(static_or_dynamic)
+     report_dict.get('Precision Type').append(precision_type)
+     report_dict.get('Conversion Result').append(conversion_result)
+-    # report_dict.get('FPS').append(fps)
++    report_dict.get('FPS').append(fps)
+ 
+     for metric in metric_info:
+         for metric_name, metric_value in metric.items():
+@@ -371,12 +371,15 @@
+ 
+     # get pytorch fps value
+     fps_info = model_info.get('Metadata').get('inference time (ms/im)')
++    backend_name = "Pytorch"
+     if fps_info is None:
+         fps = '-'
+     elif isinstance(fps_info, list):
+-        fps = fps_info[0].get('value')
++        fps = 1000 / fps_info[0].get('value')
++        backend_name += f"({fps_info[0].get('hardware')})"
+     else:
+-        fps = fps_info.get('value')
++        fps = 1000 / fps_info.get('value')
++        backend_name += f"({fps_info[0].get('hardware')})"
+ 
+     logger.info(f'Got metric_list = {metric_list} ')
+     logger.info(f'Got pytorch_metric = {pytorch_metric} ')
+@@ -384,12 +387,12 @@
+     # update report
+     update_report(
+         report_dict=report_dict,
+-        model_name=model_name,
++        model_name=model_name + " (official data)",
+         model_config=str(model_config_path),
+         task_name=task_type,
+         checkpoint=str(checkpoint_path),
+         dataset=dataset_type,
+-        backend_name='Pytorch',
++        backend_name=backend_name,
+         deploy_config='-',
+         static_or_dynamic='-',
+         precision_type='-',
+@@ -1153,7 +1156,7 @@
+             'Static or Dynamic': [],
+             'Precision Type': [],
+             'Conversion Result': [],
+-            # 'FPS': []
++            'FPS': []
+         }
+ 
+         global_info = yaml_info.get('globals')
